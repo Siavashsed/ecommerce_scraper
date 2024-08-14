@@ -1,6 +1,5 @@
 name: Unzip Files
 
-# Trigger this workflow when there is a push to the repository, specifically when a zip file is added
 on:
   push:
     paths:
