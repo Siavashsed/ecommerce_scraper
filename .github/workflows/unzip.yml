@@ -1,26 +1,32 @@
-name: Unzip File
+name: Unzip Files
 
+# Trigger this workflow when there is a push to the repository, specifically when a zip file is added
 on:
   push:
     paths:
-      - '*.zip'
+      - '**/*.zip'
 
 jobs:
   unzip:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest version of Ubuntu as the environment
+
     steps:
-      - name: Checkout repository content
-        uses: actions/checkout@v2
+    - name: Checkout the code  # Step to check out the repository code
+      uses: actions/checkout@v2
 
-      - name: Unzip file
-        run: |
-          sudo apt-get install unzip
-          unzip '*.zip' -d ./unzipped/
+    - name: Install unzip utility  # Step to ensure the unzip tool is available
+      run: sudo apt-get install -y unzip
 
-      - name: Commit unzipped content
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ./unzipped/
-          git commit -m "Added unzipped files"
-          git push
+    - name: Unzip all zip files in the repository  # Step to unzip any found zip files
+      run: |
+        for file in $(find . -name '*.zip'); do
+          unzip "$file" -d "${file%.*}"
+        done
+
+    - name: Commit unzipped files back to the repository  # Step to commit the unzipped content back to the repo
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+        git add .
+        git commit -m "Unzipped files"
+        git push
